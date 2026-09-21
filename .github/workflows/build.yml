@@ -1,0 +1,43 @@
+name: build-windows
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup CMake 3.28
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.28.6
+
+      - name: Setup MSBuild (VS2022)
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Show versions
+        run: |
+          cmake --version
+          msbuild -version
+
+      - name: Build VTIL-Core (Release x64)
+        run: |
+          cmake -B VTIL-Core/build -S VTIL-Core -A x64 -DVTIL_BUILD_TESTS=OFF
+          cmake --build VTIL-Core/build --config Release --parallel
+
+      - name: Build devirt.sln (Release|x64)
+        run: msbuild devirt.sln /p:Configuration=Release /p:Platform=x64 /m /v:m
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: devirt-x64-Release
+          path: |
+            x64/Release/*.exe
+            x64/Release/*.pdb
