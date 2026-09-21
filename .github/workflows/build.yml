@@ -21,6 +21,11 @@ jobs:
       - name: Setup MSBuild (VS2022)
         uses: microsoft/setup-msbuild@v2
 
+      - name: Setup MSVC env (x64)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Show versions
         run: |
           cmake --version
@@ -28,7 +33,7 @@ jobs:
 
       - name: Build VTIL-Core (Release x64)
         run: |
-          cmake -B VTIL-Core/build -S VTIL-Core -A x64 -DVTIL_BUILD_TESTS=OFF
+          cmake -B VTIL-Core/build -S VTIL-Core -G "Visual Studio 17 2022" -A x64 -DVTIL_BUILD_TESTS=OFF
           cmake --build VTIL-Core/build --config Release --parallel
 
       - name: Build devirt.sln (Release|x64)
