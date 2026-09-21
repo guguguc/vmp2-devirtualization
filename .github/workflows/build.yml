@@ -37,6 +37,8 @@ jobs:
           cmake --build VTIL-Core/build --config Release --parallel
 
       - name: Build devirt.sln (Release|x64)
+        env:
+          CL: /DZYDIS_STATIC_DEFINE /DZYCORE_STATIC_DEFINE
         run: msbuild devirt.sln /p:Configuration=Release /p:Platform=x64 /m /v:m
 
       - name: Upload artifacts
